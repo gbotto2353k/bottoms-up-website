@@ -290,9 +290,18 @@
         <p class="text-brand-200 text-base">Apply for the free pilot or ask us anything. We'll get back to you same day.</p>
       </div>
 
+      <div id="form-success" class="hidden bg-white rounded-2xl p-8 shadow-xl text-center">
+        <div class="w-14 h-14 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-5">
+          <svg class="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">You're all set!</h3>
+        <p class="text-gray-500 text-sm">Thank you! We'll be in touch within 24 hours.</p>
+      </div>
+
       <form
-        action="https://formspree.io/f/xzdyvprb"
-        method="POST"
+        id="contact-form"
         class="bg-white rounded-2xl p-8 shadow-xl space-y-5"
       >
         <div>
@@ -340,18 +349,45 @@
           ></textarea>
         </div>
 
-        <!-- Honeypot anti-spam -->
-        <input type="text" name="_gotcha" style="display:none">
-        <input type="hidden" name="_subject" value="New inquiry — Bottoms Up Businesses">
-
         <button
           type="submit"
-          class="w-full bg-brand-600 text-white font-semibold py-3.5 rounded-xl hover:bg-brand-700 transition-colors text-base"
+          id="submit-btn"
+          class="w-full bg-brand-600 text-white font-semibold py-3.5 rounded-xl hover:bg-brand-700 transition-colors text-base disabled:opacity-60 disabled:cursor-not-allowed"
         >
           Send Message
         </button>
         <p class="text-center text-xs text-gray-400">We respond same day, usually within a few hours.</p>
       </form>
+
+      <script>
+        document.getElementById('contact-form').addEventListener('submit', async function(e) {
+          e.preventDefault();
+          const btn = document.getElementById('submit-btn');
+          btn.disabled = true;
+          btn.textContent = 'Sending…';
+
+          const data = {
+            name:     this.name.value.trim(),
+            email:    this.email.value.trim(),
+            phone:    this.phone.value.trim(),
+            business: this.business.value.trim(),
+            message:  this.message.value.trim(),
+          };
+
+          try {
+            await fetch('https://n8n.srv1602473.hstgr.cloud/webhook/ec9a8197-d2d5-46d5-9c4c-f04de536251c3', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data),
+            });
+          } catch (_) {
+            // proceed to success view even on network edge cases
+          }
+
+          this.classList.add('hidden');
+          document.getElementById('form-success').classList.remove('hidden');
+        });
+      </script>
     </div>
   </section>
 
